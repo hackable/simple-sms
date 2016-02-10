@@ -18,7 +18,7 @@ use SimpleSoftwareIO\SMS\Drivers\LabsMobileSMS;
 use SimpleSoftwareIO\SMS\Drivers\MozeoSMS;
 use SimpleSoftwareIO\SMS\Drivers\NexmoSMS;
 use SimpleSoftwareIO\SMS\Drivers\TwilioSMS;
-use SimpleSoftwareIO\SMS\Drivers\Msg21SMS;
+use SimpleSoftwareIO\SMS\Drivers\Msg91SMS;
 
 class DriverManager extends Manager
 {
@@ -111,9 +111,9 @@ class DriverManager extends Manager
     }
 
 
-    protected function createMsg21Driver()
+    protected function createMsg91Driver()
     {
-        $config = $this->app['config']->get('sms.msg21', []);
+        $config = $this->app['config']->get('sms.msg91', []);
 
         $provider = new NexmoSMS(
             new Client,
