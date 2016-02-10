@@ -10,7 +10,7 @@
 use SimpleSoftwareIO\SMS\IncomingMessage;
 use SimpleSoftwareIO\SMS\OutgoingMessage;
 use GuzzleHttp\Client;
-class LabsMobileSMS extends AbstractSMS implements DriverInterface
+class Msg91SMS extends AbstractSMS implements DriverInterface
 {
     /**
      * The Guzzle HTTP Client
@@ -23,15 +23,18 @@ class LabsMobileSMS extends AbstractSMS implements DriverInterface
      *
      * @var string
      */
-    protected $apiBase = 'https://api.labsmobile.com/get/send.php';
+    protected $apiBase = 'http://api.msg91.com/api/sendhttp.php';
     /**
      * Constructs the MozeoSMS Instance.
      *
      * @param Client $client The guzzle client
      */
-    public function __construct(Client $client)
+    public function __construct(Client $client, $authKey , $route, $senderId )
     {
-        $this->client = $client;
+        $this->client  = $client;
+        $this->authKey = $authKey;
+        $this->route   = $route;
+        $this->senderId = $senderId;
     }
     /**
      * Sends a SMS message.
@@ -42,15 +45,24 @@ class LabsMobileSMS extends AbstractSMS implements DriverInterface
     public function send(OutgoingMessage $message)
     {
         $composeMessage = $message->composeMessage();
-        foreach($message->getTo() as $to)
-        {
-            $data = [
-                'msisdn' => $to,
-                'message' => $composeMessage
-            ];
-            $this->buildBody($data);
-            $this->getRequest();
-        }
+        
+        $from = $message->getFrom();
+        
+        //Convert to callfire format.
+        $numbers = implode(",", $message->getTo());
+        
+        $data = [
+             'authkey' => $this->authKey,
+             'mobiles' => $numbers,
+             'message' => $composeMessage,
+             'sender' => $this->senderId,
+             'route' => $this->route,
+        ];
+
+        $this->buildBody($data);
+        
+        return $this->postRequest();
+
     }
     /**
      * Creates many IncomingMessage objects and sets all of the properties.
@@ -59,7 +71,7 @@ class LabsMobileSMS extends AbstractSMS implements DriverInterface
      */
     protected function processReceive($rawMessage)
     {
-        throw new \RuntimeException('LabsMobile does not support Inbound API Calls.');
+        throw new \RuntimeException('Msg91 does not support Inbound API Calls.');
     }
     /**
      * Checks the server for messages and returns their results.
@@ -68,7 +80,7 @@ class LabsMobileSMS extends AbstractSMS implements DriverInterface
      */
     public function checkMessages(Array $options = array())
     {
-        throw new \RuntimeException('LabsMobile does not support Inbound API Calls.');
+        throw new \RuntimeException('Msg91 does not support Inbound API Calls.');
     }
     /**
      * Gets a single message by it's ID.
@@ -77,7 +89,7 @@ class LabsMobileSMS extends AbstractSMS implements DriverInterface
      */
     public function getMessage($messageId)
     {
-        throw new \RuntimeException('LabsMobile does not support Inbound API Calls.');
+        throw new \RuntimeException('Msg91 does not support Inbound API Calls.');
     }
     /**
      * Receives an incoming message via REST call.
@@ -88,6 +100,6 @@ class LabsMobileSMS extends AbstractSMS implements DriverInterface
      */
     public function receive($raw)
     {
-        throw new \RuntimeException('LabsMobile does not support Inbound API Calls.');
+        throw new \RuntimeException('Msg91 does not support Inbound API Calls.');
     }
 }
