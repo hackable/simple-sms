@@ -7,7 +7,7 @@
  * @author SimpleSoftware support@simplesoftware.io
  *
  */
-use SimpleSoftwareIO\SMS\IncomingMessage;
+
 use SimpleSoftwareIO\SMS\OutgoingMessage;
 use GuzzleHttp\Client;
 class Msg91SMS extends AbstractSMS implements DriverInterface
@@ -23,18 +23,22 @@ class Msg91SMS extends AbstractSMS implements DriverInterface
      *
      * @var string
      */
-    protected $apiBase = 'http://api.msg91.com/api/sendhttp.php';
+    protected $apiBase = 'https://control.msg91.com/api/';
+   
+    protected $authkey;
+
+    protected $route;
+
     /**
      * Constructs the MozeoSMS Instance.
      *
      * @param Client $client The guzzle client
      */
-    public function __construct(Client $client, $authKey , $route, $senderId )
+    public function __construct(Client $client, $authkey , $route)
     {
         $this->client  = $client;
-        $this->authKey = $authKey;
+        $this->authkey = $authkey;
         $this->route   = $route;
-        $this->senderId = $senderId;
     }
     /**
      * Sends a SMS message.
@@ -44,24 +48,24 @@ class Msg91SMS extends AbstractSMS implements DriverInterface
      */
     public function send(OutgoingMessage $message)
     {
-        $composeMessage = $message->composeMessage();
-        
+
         $from = $message->getFrom();
-        
+        $composeMessage = $message->composeMessage();
         //Convert to callfire format.
         $numbers = implode(",", $message->getTo());
-        
         $data = [
-             'authkey' => $this->authKey,
-             'mobiles' => $numbers,
-             'message' => $composeMessage,
-             'sender' => $this->senderId,
-             'route' => $this->route,
+            'authkey'       => $this->authkey,
+            'mobiles'       => $numbers,
+            'message'       => $composeMessage,
+            'sender'        => $from,
+            'route'         => $this->route
         ];
 
-        $this->buildBody($data);
         
-        return $this->postRequest();
+        $this->buildCall('/sendhttp.php');
+        $this->buildBody($data);
+
+        echo($this->getRequest()->getBody());
 
     }
     /**
