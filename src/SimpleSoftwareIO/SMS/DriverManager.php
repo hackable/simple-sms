@@ -115,11 +115,10 @@ class DriverManager extends Manager
     {
         $config = $this->app['config']->get('sms.msg91', []);
 
-        $provider = new NexmoSMS(
+        $provider = new Msg91SMS(
             new Client,
-            $config['authKey'],
-            $config['route'],
-            $config['senderId']
+            $config['authkey'],
+            $config['route']
         );
 
         return $provider;
