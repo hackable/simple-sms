@@ -63,9 +63,10 @@ class Msg91SMS extends AbstractSMS implements DriverInterface
 
         
         $this->buildCall('/sendhttp.php');
+        
         $this->buildBody($data);
 
-        echo($this->getRequest()->getBody());
+        return $this->getRequest();
 
     }
     /**
